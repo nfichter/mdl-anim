@@ -130,53 +130,90 @@ def run(filename):
 			args = command[1:]
 			if c == 'box':
 				if str(args[-1]) == args[-1]:
-					for arg in args[:-1]:
-						arg *= float(knobs[frame][args[-1]])
+					new_args = []
+					for i in range(len(args)-1):
+						if type(args[i]) is int or type(args[i]) is float:
+							new_args.append(args[i] * float(knobs[frame][args[-1]]))
+						else:
+							new_args.append(args[i])
+				else:
+					new_args = args
 				add_box(tmp,
-						args[0], args[1], args[2],
-						args[3], args[4], args[5])
+						new_args[0], new_args[1], new_args[2],
+						new_args[3], new_args[4], new_args[5])
 				matrix_mult( stack[-1], tmp )
 				draw_polygons(tmp, screen, color)
 				tmp = []
 			elif c == 'sphere':
 				if str(args[-1]) == args[-1]:
-					for arg in args[:-1]:
-						arg *= float(knobs[frame][args[-1]])			
+					new_args = []
+					for i in range(len(args)-1):
+						if type(args[i]) is int or type(args[i]) is float:
+							new_args.append(args[i] * float(knobs[frame][args[-1]]))
+						else:
+							new_args.append(args[i])
+				else:
+					new_args = args
 				add_sphere(tmp,
-						   args[0], args[1], args[2], args[3], step)
+						   new_args[0], new_args[1], new_args[2], new_args[3], step)
 				matrix_mult( stack[-1], tmp )
 				draw_polygons(tmp, screen, color)
 				tmp = []
 			elif c == 'torus':
 				if str(args[-1]) == args[-1]:
-					for arg in args[:-1]:
-						arg *= float(knobs[frame][args[-1]])
+					new_args = []
+					for i in range(len(args)-1):
+						if type(args[i]) is int or type(args[i]) is float:
+							new_args.append(args[i] * float(knobs[frame][args[-1]]))
+						else:
+							new_args.append(args[i])
+				else:
+					new_args = args
 				add_torus(tmp,
-						  args[0], args[1], args[2], args[3], args[4], step)
+						  new_args[0], new_args[1], new_args[2], new_args[3], new_args[4], step)
 				matrix_mult( stack[-1], tmp )
 				draw_polygons(tmp, screen, color)
 				tmp = []
 			elif c == 'move':
+				print args
 				if str(args[-1]) == args[-1]:
-					for arg in args[:-1]:
-						arg *= float(knobs[frame][args[-1]])
-				tmp = make_translate(args[0], args[1], args[2])
+					new_args = []
+					for i in range(len(args)-1):
+						if type(args[i]) is int or type(args[i]) is float:
+							new_args.append(args[i] * float(knobs[frame][args[-1]]))
+						else:
+							new_args.append(args[i])
+				else:
+					new_args = args
+				print args
+				tmp = make_translate(new_args[0], new_args[1], new_args[2])
 				matrix_mult(stack[-1], tmp)
 				stack[-1] = [x[:] for x in tmp]
 				tmp = []
 			elif c == 'scale':
 				if str(args[-1]) == args[-1]:
-					for arg in args[:-1]:
-						arg *= float(knobs[frame][args[-1]])
-				tmp = make_scale(args[0], args[1], args[2])
+					new_args = []
+					for i in range(len(args)-1):
+						if type(args[i]) is int or type(args[i]) is float:
+							new_args.append(args[i] * float(knobs[frame][args[-1]]))
+						else:
+							new_args.append(args[i])
+				else:
+					new_args = args
+				tmp = make_scale(new_args[0], new_args[1], new_args[2])
 				matrix_mult(stack[-1], tmp)
 				stack[-1] = [x[:] for x in tmp]
 				tmp = []
 			elif c == 'rotate':
 				if str(args[-1]) == args[-1]:
-					for arg in args[:-1]:
-						if type(arg) is int or type(arg) is float:
-							arg *= float(knobs[frame][args[-1]])
+					new_args = []
+					for i in range(len(args)-1):
+						if type(args[i]) is int or type(args[i]) is float:
+							new_args.append(args[i] * float(knobs[frame][args[-1]]))
+						else:
+							new_args.append(args[i])
+				else:
+					new_args = args
 				theta = args[1] * (math.pi/180)
 				if args[0] == 'x':
 					tmp = make_rotX(theta)
