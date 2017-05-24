@@ -23,10 +23,13 @@ from draw import *
   
 
 num_frames = 1
-basename = 'anim'
+basename = ''
 anim = False
 
 def first_pass( commands ):
+	global num_frames
+	global basename
+	global anim
 	for command in commands:
 		if command[0] == "frames":
 			num_frames = int(command[1])
@@ -37,8 +40,10 @@ def first_pass( commands ):
 	if anim and num_frames == 0:
 		print "'vary' used but number of frames not set. Exiting."
 		exit()
-	if num_frames != 0:
+	if basename == '':
+		basename = 'anim'
 		print "No base name found. Using 'anim' as default base name."
+	second_pass( commands )
 
 """======== second_pass( commands ) ==========
 
@@ -57,12 +62,15 @@ def first_pass( commands ):
   dictionary corresponding to the given knob with the
   appropirate value. 
   ===================="""
-  
+
 knobs = []
 
-def second_pass( commands, num_frames ):
+def second_pass( commands ):
+	global num_frames
+	global basename
+	global anim
 	for frame in range(num_frames):
-		knobs[frame] = {}
+		knobs.append({})
 	for command in commands:
 		if command[0] == "vary":
 			if int(command[2]) > int(command[3]):
@@ -84,6 +92,9 @@ def second_pass( commands, num_frames ):
 					current += increment
 
 def run(filename):
+	global num_frames
+	global basename
+	global anim
 	"""
 	This function runs an mdl script
 	"""
@@ -104,6 +115,8 @@ def run(filename):
 	screen = new_screen()
 	tmp = []
 	step = 0.1
+	first_pass(commands)
+	print num_frames
 	for frame in range(num_frames):
 		if frame < 10:
 			file = 'anim/' + basename + '00' + str(frame) + '.png'
@@ -162,7 +175,8 @@ def run(filename):
 			elif c == 'rotate':
 				if str(args[-1]) == args[-1]:
 					for arg in args[:-1]:
-						arg *= float(knobs[frame][args[-1]])
+						if type(arg) is int or type(arg) is float:
+							arg *= float(knobs[frame][args[-1]])
 				theta = args[1] * (math.pi/180)
 				if args[0] == 'x':
 					tmp = make_rotX(theta)
@@ -177,7 +191,10 @@ def run(filename):
 				stack.append([x[:] for x in stack[-1]] )
 			elif c == 'pop':
 				stack.pop()
-			elif c == 'display':
-				display(screen)
-			elif c == 'save':
-				save_extension(screen, args[0])
+			if not anim:
+				if c == 'display':
+					display(screen)
+				if c == 'save':
+					save_extension(screen, args[0])
+		if anim:
+			save_extension(screen, file)
