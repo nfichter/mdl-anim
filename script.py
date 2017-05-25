@@ -43,7 +43,7 @@ def first_pass( commands ):
 	if basename == '':
 		basename = 'anim'
 		print "No base name found. Using 'anim' as default base name."
-	second_pass( commands )
+	return second_pass( commands )
 
 """======== second_pass( commands ) ==========
 
@@ -63,12 +63,11 @@ def first_pass( commands ):
   appropirate value. 
   ===================="""
 
-knobs = []
-
 def second_pass( commands ):
 	global num_frames
 	global basename
 	global anim
+	knobs = []
 	for frame in range(num_frames):
 		knobs.append({})
 	for command in commands:
@@ -90,17 +89,17 @@ def second_pass( commands ):
 					increment = (float(command[5])-float(command[4]))/(float(command[3])-float(command[2]))
 					knobs[frame][command[1]] = current
 					current += increment
+	return knobs
 
 def run(filename):
 	global num_frames
 	global basename
 	global anim
+	global knobs
 	"""
 	This function runs an mdl script
 	"""
 	color = [255, 255, 255]
-	tmp = new_matrix()
-	ident( tmp )
 
 	p = mdl.parseFile(filename)
 
@@ -109,15 +108,15 @@ def run(filename):
 	else:
 		print "Parsing failed."
 		return
-
-	ident(tmp)
-	stack = [ [x[:] for x in tmp] ]
-	screen = new_screen()
-	tmp = []
 	step = 0.1
-	first_pass(commands)
+	knobs = first_pass(commands)
+	print knobs
 	print num_frames
+	screen = new_screen()
 	for frame in range(num_frames):
+		tmp = new_matrix()
+		ident(tmp)
+		stack = [ [x[:] for x in tmp] ]
 		if frame < 10:
 			file = 'anim/' + basename + '00' + str(frame) + '.png'
 		elif frame < 100:
@@ -129,7 +128,7 @@ def run(filename):
 			c = command[0]
 			args = command[1:]
 			if c == 'box':
-				if str(args[-1]) == args[-1]:
+				if str(args[-1]) == args[-1] and args[-1] != None:
 					new_args = []
 					for i in range(len(args)-1):
 						if type(args[i]) is int or type(args[i]) is float:
@@ -145,7 +144,7 @@ def run(filename):
 				draw_polygons(tmp, screen, color)
 				tmp = []
 			elif c == 'sphere':
-				if str(args[-1]) == args[-1]:
+				if str(args[-1]) == args[-1] and args[-1] != None:
 					new_args = []
 					for i in range(len(args)-1):
 						if type(args[i]) is int or type(args[i]) is float:
@@ -157,10 +156,11 @@ def run(filename):
 				add_sphere(tmp,
 						   new_args[0], new_args[1], new_args[2], new_args[3], step)
 				matrix_mult( stack[-1], tmp )
+				print stack[-1]
 				draw_polygons(tmp, screen, color)
 				tmp = []
 			elif c == 'torus':
-				if str(args[-1]) == args[-1]:
+				if str(args[-1]) == args[-1] and args[-1] != None:
 					new_args = []
 					for i in range(len(args)-1):
 						if type(args[i]) is int or type(args[i]) is float:
@@ -175,7 +175,7 @@ def run(filename):
 				draw_polygons(tmp, screen, color)
 				tmp = []
 			elif c == 'move':
-				if str(args[-1]) == args[-1]:
+				if str(args[-1]) == args[-1] and args[-1] != None:
 					new_args = []
 					for i in range(len(args)-1):
 						if type(args[i]) is int or type(args[i]) is float:
@@ -189,7 +189,7 @@ def run(filename):
 				stack[-1] = [x[:] for x in tmp]
 				tmp = []
 			elif c == 'scale':
-				if str(args[-1]) == args[-1]:
+				if str(args[-1]) == args[-1] and args[-1] != None:
 					new_args = []
 					for i in range(len(args)-1):
 						if type(args[i]) is int or type(args[i]) is float:
@@ -203,13 +203,14 @@ def run(filename):
 				stack[-1] = [x[:] for x in tmp]
 				tmp = []
 			elif c == 'rotate':
-				if str(args[-1]) == args[-1]:
+				if str(args[-1]) == args[-1] and args[-1] != None:
 					new_args = []
 					for i in range(len(args)-1):
 						if type(args[i]) is int or type(args[i]) is float:
 							new_args.append(args[i] * float(knobs[frame][args[-1]]))
 						else:
 							new_args.append(args[i])
+					print new_args
 				else:
 					new_args = args
 				theta = new_args[1] * (math.pi/180)
@@ -223,15 +224,17 @@ def run(filename):
 				stack[-1] = [ x[:] for x in tmp]
 				tmp = []
 			elif c == 'push':
-				stack.append([x[:] for x in stack[-1]] )
+				stack.append([x[:] for x in stack[-1]])
 			elif c == 'pop':
 				stack.pop()
 			if not anim:
 				if c == 'display':
 					display(screen)
+					clear_screen(screen)
 				if c == 'save':
 					save_extension(screen, args[0])
 		if anim:
 			save_extension(screen, file)
+		clear_screen(screen)
 	if anim:
 		make_animation(basename)
