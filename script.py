@@ -175,7 +175,6 @@ def run(filename):
 				draw_polygons(tmp, screen, color)
 				tmp = []
 			elif c == 'move':
-				print args
 				if str(args[-1]) == args[-1]:
 					new_args = []
 					for i in range(len(args)-1):
@@ -185,7 +184,6 @@ def run(filename):
 							new_args.append(args[i])
 				else:
 					new_args = args
-				print args
 				tmp = make_translate(new_args[0], new_args[1], new_args[2])
 				matrix_mult(stack[-1], tmp)
 				stack[-1] = [x[:] for x in tmp]
@@ -214,10 +212,10 @@ def run(filename):
 							new_args.append(args[i])
 				else:
 					new_args = args
-				theta = args[1] * (math.pi/180)
-				if args[0] == 'x':
+				theta = new_args[1] * (math.pi/180)
+				if new_args[0] == 'x':
 					tmp = make_rotX(theta)
-				elif args[0] == 'y':
+				elif new_args[0] == 'y':
 					tmp = make_rotY(theta)
 				else:
 					tmp = make_rotZ(theta)
@@ -235,3 +233,5 @@ def run(filename):
 					save_extension(screen, args[0])
 		if anim:
 			save_extension(screen, file)
+	if anim:
+		make_animation(basename)
