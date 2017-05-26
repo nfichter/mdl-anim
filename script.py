@@ -78,17 +78,16 @@ def second_pass( commands ):
 				print "Invalid range: end frame of knob %s is greater than number of frames. Exiting."%command[1]
 			if int(command[2]) < 0 or int(command[3]) < 0:
 				print "Invalid range: frames of knob %s cannot be negative. Exiting."%command[1]
+			if int(command[4]) < int(command[5]):
+				current = int(command[4])
+				increment = (float(command[5])-float(command[4]))/(float(command[3])-float(command[2]))
+			else:
+				current = int(command[5])
+				increment = (float(command[5])-float(command[4]))/(float(command[3])-float(command[2]))
 			for frame in range(num_frames):
-				if int(command[4]) < int(command[5]):
-					current = int(command[4])
-					increment = (float(command[5])-float(command[4]))/(float(command[3])-float(command[2]))
-					knobs[frame][command[1]] = current
-					current += increment
-				else:
-					current = int(command[5])
-					increment = (float(command[5])-float(command[4]))/(float(command[3])-float(command[2]))
-					knobs[frame][command[1]] = current
-					current += increment
+				knobs[frame][command[1]] = current
+				current += increment
+				
 	return knobs
 
 def run(filename):
@@ -111,7 +110,6 @@ def run(filename):
 	step = 0.1
 	knobs = first_pass(commands)
 	print knobs
-	print num_frames
 	screen = new_screen()
 	for frame in range(num_frames):
 		tmp = new_matrix()
@@ -156,7 +154,6 @@ def run(filename):
 				add_sphere(tmp,
 						   new_args[0], new_args[1], new_args[2], new_args[3], step)
 				matrix_mult( stack[-1], tmp )
-				print stack[-1]
 				draw_polygons(tmp, screen, color)
 				tmp = []
 			elif c == 'torus':
@@ -210,7 +207,6 @@ def run(filename):
 							new_args.append(args[i] * float(knobs[frame][args[-1]]))
 						else:
 							new_args.append(args[i])
-					print new_args
 				else:
 					new_args = args
 				theta = new_args[1] * (math.pi/180)
